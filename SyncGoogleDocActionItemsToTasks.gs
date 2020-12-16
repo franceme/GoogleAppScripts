@@ -59,14 +59,24 @@ function SyncGoogleDocsActionItems() {
           catch (e) { 
           var error = r;
           }
-          var now = new Date();
-          var deadline = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + increase));
-
-          var taskDetails = {
-            title: 'Assigned: ' + current_string + ' in document: ' + subject,
-            notes: "https://" + set_url,
-            due: Utilities.formatDate(deadline, "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'")
-          };
+          if (increase != 0)
+          {
+            var now = new Date();
+            var deadline = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + increase));
+            
+            var taskDetails = {
+              title: 'Assigned: ' + current_string + ' in document: ' + subject,
+              notes: "https://" + set_url,
+              due: Utilities.formatDate(deadline, "GMT", "yyyy-MM-dd'T'HH:mm:ss'Z'")
+            };
+          }
+          else
+          {
+            var taskDetails = {
+              title: 'Assigned: ' + current_string + ' in document: ' + subject,
+              notes: "https://" + set_url
+            };
+          }
           Tasks.Tasks.insert(taskDetails, taskListID);
           addedToTrash = true;
         }
