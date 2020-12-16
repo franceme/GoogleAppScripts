@@ -49,14 +49,16 @@ function SyncGoogleDocsActionItems() {
           var increase = 1;
           try {
             var daypattern = /[0-9]+day/g;
-            var result = current_string.match(patt1);
+            var result = current_string.match(daypattern);
             if (result != null) {
               var searched_value = result[0];
               increase = Number(searched_value.replace('day', ''));
               current_string = current_string.replace(searched_value,'');
             }
           }
-          catch (e) { }
+          catch (e) { 
+          var error = r;
+          }
           var now = new Date();
           var deadline = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + increase));
 
