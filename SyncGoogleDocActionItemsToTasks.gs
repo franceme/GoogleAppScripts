@@ -2,17 +2,14 @@ function SyncGoogleDocsActionItems() {
 
   var props = PropertiesService.getScriptProperties();
 
-
   var google_doc_url = "docs.google.com/"
   var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
   var regex = new RegExp(expression);
 
-
   var email = "@" + props.getProperty('email');
-  var task_description = /@frantzme@vt.edu/gi;
-  var taskregex = RegExp(task_description);
 
-  var end_of_task_desc = "_Assigned to you";
+  //NEED to capture the comments -> change to Reply
+  var end_of_task_desc = ["_Assigned to you","*Assigned to you*","Reply","Assigned to you"];
 
   var taskListID = props.getProperty('taskListID');
 
@@ -36,15 +33,28 @@ function SyncGoogleDocsActionItems() {
           }
         }
 
-
-        //var tasks = [];
         var index_of = plainMail.indexOf(email);
         var rolling_itr = 0;
         while (index_of != -1) {
           rolling_itr = index_of;
-          var current_length = plainMail.indexOf(end_of_task_desc, rolling_itr);
+          var current_length = -1;
+
+          /*
+           * Iterating through several different suffix endings in the email
+           *
+          */
+          for (var suffix_itr = 0;suffix_itr < end_of_task_desc.length;suffix_itr++) {
+              if (current_length !== -1)
+                break;
+              current_length = plainMail.indexOf(end_of_task_desc[suffix_itr], rolling_itr)
+          }
+
+          //This condition if a stop gap if there was not ending of the condition
+          if (current_length === -1)
+            break;
+
           var current_string = plainMail.substring(rolling_itr, current_length).replace(email, "").trim();
-          //tasks.push(current_string);
+
           index_of = plainMail.indexOf(email, current_length);
           var increase = 1;
           try {
