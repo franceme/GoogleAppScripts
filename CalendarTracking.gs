@@ -8,20 +8,33 @@ function getCalendarEvents(){
   var calendarEvents = cal.getEvents(twentyfourHoursBeforeNow, now);
 
   function alter(event) {
+    event.get
     var rawSDuration = (event.getEndTime() - event.getStartTime())/1000;
-    return {
-        id: event.getId(),
-        title: event.getTitle(),
-        startTime: event.getStartTime(),
-        endTime: event.getEndTime(),
-        runningTime: rawSDuration/60
-    };
+    var subTitles = event.getTitle().split("/");
+    var output = [];
+    for (var itr=0;itr < subTitles.length;itr++)
+    {
+      output.push(
+        {
+            id: event.getId(),
+            title: subTitles[itr],
+            startTime: event.getStartTime(),
+            endTime: event.getEndTime(),
+            runningTime: (rawSDuration/60)/subTitles.length
+        }
+      );
+    }
+    return output;
   }
 
   for (var itr = 0;itr < calendarEvents.length;itr ++) {
-    eventslog.push(
-      alter(calendarEvents[itr])
-    );
+    var containerEvents = alter(calendarEvents[itr]);
+    for (var subItr = 0;subItr<containerEvents.length;subItr++)
+    {
+      eventslog.push(
+        containerEvents[subItr]
+      );
+    }
   }
 
   return eventslog;
