@@ -1,10 +1,9 @@
-function getTasks() {
-  var now = new Date();
+function getTasks(now) {
   var output = [];
 
   var optionalArgs = {
-    showHidden: false,
-    maxResults: 100000000  
+    showHidden: true,
+    maxResults: 500  
   };
 
   var taskListID = PropertiesService.getScriptProperties().getProperty('taskListID');
@@ -45,9 +44,11 @@ function getTasks() {
         }
         return string;
       }
-
-      var string_date = prepend(task_date.getUTCFullYear())+"/"+prepend(task_date.getUTCMonth()+1)+"/"+prepend(task_date.getUTCDate());
-      var string_time = prepend(task_date.getUTCHours())+":"+prepend(task_date.getUTCMinutes())+":"+prepend(task_date.getUTCSeconds());
+    
+      //var string_date = prepend(task_date.getUTCFullYear())+"/"+prepend(task_date.getUTCMonth()+1)+"/"+prepend(task_date.getUTCDate());
+      //var string_time = prepend(task_date.getUTCHours())+":"+prepend(task_date.getUTCMinutes())+":"+prepend(task_date.getUTCSeconds());
+      var string_date = Utilities.formatDate(task_date, "EST", "YYYY-MM-dd");
+      var string_time = Utilities.formatDate(task_date, "EST", "HH:mm:ss");
       output.push(alter(current_task, string_date, string_time));
     }
 
@@ -77,7 +78,35 @@ function getCompletedTasks(tasks) {
   }
 }
 
+function getCompletedTasksDoc(currentDate, tasks) {
+  var docID = PropertiesService.getScriptProperties().getProperty('docID');
+  var DOC = DocumentApp.openById(docID);
+  
+  var section = DOC.addHeader();
+  section.setText(currentDate);
+
+  
+  for (var i = 0; i < tasks.length; i++) {
+    var task = tasks[i];
+    var current_task = section.insertListItem(task.id);
+    
+    current_task.insertListItem(task.id);
+    current_task.insertListItem(task.title);
+    current_task.insertListItem(task.notes);
+    current_task.insertListItem(task.due);
+    current_task.insertListItem(task.completed);
+    current_task.insertListItem(task.completedDay);
+    current_task.insertListItem(task.completedTime);
+    current_task.insertListItem(task.etag);
+    current_task.insertListItem(task.selfLink);
+    current_task.insertListItem(task.kind);
+    current_task.insertListItem(task.status);
+  }
+}
 
 function myFunction() {
-  getCompletedTasks(getTasks());
+  var now = new Date();
+  var todayTasks = getTasks(now);
+  getCompletedTasks(todayTasks);
+  getCompletedTasksDoc(now, todayTasks);
 }
